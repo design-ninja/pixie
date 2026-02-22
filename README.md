@@ -22,9 +22,22 @@ Install directly from the [Chrome Web Store](https://chrome.google.com/webstore/
    ```bash
    git clone https://github.com/design-ninja/hex-picker.git
    ```
-2. Open Chrome and go to `chrome://extensions/`
-3. Enable **Developer mode** (toggle in top right)
-4. Click **Load unpacked** and select the cloned folder
+2. Install dependencies:
+   ```bash
+   pnpm install
+   ```
+3. Build the extension:
+   ```bash
+   pnpm build
+   ```
+4. Open Chrome and go to `chrome://extensions/`
+5. Enable **Developer mode** (toggle in top right)
+6. Click **Load unpacked** and select the `dist` folder
+
+## Development
+
+- `pnpm typecheck` — runs TypeScript checks without emitting files
+- `pnpm build` — builds scripts and copies static assets into `dist/`
 
 ## Usage
 

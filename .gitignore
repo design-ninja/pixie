@@ -24,3 +24,7 @@ Icon
 Network Trash Folder
 Temporary Items
 .apdisk
+
+# Build and dependencies
+node_modules
+dist
