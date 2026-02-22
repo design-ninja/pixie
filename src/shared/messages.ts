@@ -1,3 +1,5 @@
+import type { HistoryEntry } from "./color-schemes.js";
+
 export type PopupToContentMessage = {
   from: "popup";
   query: "eye_dropper_clicked";
@@ -7,35 +9,50 @@ export type BadgeColorMessage = {
   color: string;
 };
 
+export type HistoryEntrySavedMessage = {
+  query: "history_entry_saved";
+  sourceColor: string;
+  entry: HistoryEntry;
+};
+
 export type ClearBadgeMessage = {
   query: "clear_badge";
 };
 
-export type RuntimeMessage = PopupToContentMessage | BadgeColorMessage | ClearBadgeMessage;
+export type RuntimeMessage = PopupToContentMessage | BadgeColorMessage | HistoryEntrySavedMessage | ClearBadgeMessage;
+
+function isObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null;
+}
 
 export function isPopupToContentMessage(message: unknown): message is PopupToContentMessage {
-  if (typeof message !== "object" || message === null) {
+  if (!isObject(message)) {
     return false;
   }
 
-  const candidate = message as Record<string, unknown>;
-  return candidate.from === "popup" && candidate.query === "eye_dropper_clicked";
+  return message.from === "popup" && message.query === "eye_dropper_clicked";
 }
 
 export function isClearBadgeMessage(message: unknown): message is ClearBadgeMessage {
-  if (typeof message !== "object" || message === null) {
+  if (!isObject(message)) {
     return false;
   }
 
-  const candidate = message as Record<string, unknown>;
-  return candidate.query === "clear_badge";
+  return message.query === "clear_badge";
 }
 
 export function isBadgeColorMessage(message: unknown): message is BadgeColorMessage {
-  if (typeof message !== "object" || message === null) {
+  if (!isObject(message)) {
     return false;
   }
 
-  const candidate = message as Record<string, unknown>;
-  return typeof candidate.color === "string";
+  return typeof message.color === "string";
+}
+
+export function isHistoryEntrySavedMessage(message: unknown): message is HistoryEntrySavedMessage {
+  if (!isObject(message)) {
+    return false;
+  }
+
+  return message.query === "history_entry_saved" && typeof message.sourceColor === "string" && isObject(message.entry);
 }

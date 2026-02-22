@@ -16,12 +16,18 @@
                 <img src="logo.svg" alt="hexPicker">
                 <h1 class="title">hexPicker</h1>
             </div>
-            <div id="menu">⋮</div>
+            <div class="header__controls">
+                <label class="inline-format" for="formatSelect">
+                    <span class="sr-only">Color type</span>
+                    <select id="formatSelect"></select>
+                </label>
+                <div id="menu">⋮</div>
+            </div>
         </div>
+
         <div id="picker_btn_cont"></div>
 
-        <div id="result">
-        </div>
+        <div id="result"></div>
     </div>
 </body>
 <script type="module" src="scripts/popup/index.js"></script>

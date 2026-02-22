@@ -1,42 +1,28 @@
-type PopupToContentMessage = {
-  from: "popup";
-  query: "eye_dropper_clicked";
-};
+import { createHistoryEntry } from "../shared/color-schemes.js";
+import { isPopupToContentMessage } from "../shared/messages.js";
+import type { BadgeColorMessage, HistoryEntrySavedMessage } from "../shared/messages.js";
+import { addHistoryEntry, getActiveOutputFormat } from "../shared/storage.js";
 
-function isPopupToContentMessage(message: unknown): message is PopupToContentMessage {
-  if (typeof message !== "object" || message === null) {
-    return false;
-  }
+async function storePickedColor(sourceHex: string): Promise<string> {
+  const activeOutputFormat = await getActiveOutputFormat();
+  const entry = createHistoryEntry(sourceHex, activeOutputFormat);
 
-  const candidate = message as Record<string, unknown>;
-  return candidate.from === "popup" && candidate.query === "eye_dropper_clicked";
-}
+  await addHistoryEntry(entry);
 
-function readStoredColors(): Promise<string[]> {
-  return new Promise((resolve) => {
-    chrome.storage.local.get("color_hex_code", (response) => {
-      if (Array.isArray(response.color_hex_code)) {
-        resolve(response.color_hex_code as string[]);
-      } else {
-        resolve([]);
-      }
-    });
-  });
-}
+  const historyMessage: HistoryEntrySavedMessage = {
+    query: "history_entry_saved",
+    sourceColor: sourceHex,
+    entry
+  };
 
-function writeStoredColors(colors: string[]): Promise<void> {
-  return new Promise((resolve) => {
-    chrome.storage.local.set({ color_hex_code: colors }, () => {
-      resolve();
-    });
-  });
-}
+  const badgeMessage: BadgeColorMessage = {
+    color: sourceHex
+  };
 
-async function storeColor(color: string): Promise<void> {
-  const existingColors = await readStoredColors();
-  existingColors.unshift(color);
-  await writeStoredColors(existingColors);
-  await chrome.runtime.sendMessage({ color });
+  await chrome.runtime.sendMessage(historyMessage);
+  await chrome.runtime.sendMessage(badgeMessage);
+
+  return entry.valueAtPick;
 }
 
 chrome.runtime.onMessage.addListener((message: unknown) => {
@@ -51,14 +37,13 @@ chrome.runtime.onMessage.addListener((message: unknown) => {
       .open()
       .then(async (result) => {
         const color = result.sRGBHex;
+        const copiedValue = await storePickedColor(color);
 
         try {
-          await navigator.clipboard.writeText(color);
+          await navigator.clipboard.writeText(copiedValue);
         } catch (error) {
           console.error("Could not copy color:", error);
         }
-
-        await storeColor(color);
       })
       .catch((error) => {
         console.log(error);

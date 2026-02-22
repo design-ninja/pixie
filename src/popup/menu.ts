@@ -1,5 +1,5 @@
 export type PopupMenuActions = {
-  onClearColors: () => void;
+  onClearHistory: () => void;
   onLeaveReview: () => void;
   onBuyCoffee: () => void;
 };
@@ -17,9 +17,9 @@ export function setupPopupMenu(
   menuDropdown.id = "menuDropdown";
   menuDropdown.classList.add("menuDropdown");
   menuDropdown.innerHTML = `
-    <div id="clearColors" class="menu-item">Clear colors</div>
+    <div id="clearHistory" class="menu-item">Clear history</div>
     <div id="leaveReview" class="menu-item">Leave your review</div>
-    <div id="buyMeACoffee" class="menu-item">Buy me a coffee ☕️</div>
+    <div id="buyMeACoffee" class="menu-item">Buy me a coffee ☕</div>
   `;
 
   header.appendChild(menuDropdown);
@@ -41,12 +41,12 @@ export function setupPopupMenu(
     event.stopPropagation();
   });
 
-  const clearColors = menuDropdown.querySelector<HTMLElement>("#clearColors");
+  const clearHistory = menuDropdown.querySelector<HTMLElement>("#clearHistory");
   const leaveReview = menuDropdown.querySelector<HTMLElement>("#leaveReview");
   const buyMeACoffee = menuDropdown.querySelector<HTMLElement>("#buyMeACoffee");
 
-  clearColors?.addEventListener("click", () => {
-    actions.onClearColors();
+  clearHistory?.addEventListener("click", () => {
+    actions.onClearHistory();
     close();
   });
 
