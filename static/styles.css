@@ -45,8 +45,8 @@
     --format-value-bg: #2a2a2a;
     --format-value-border: #333333;
     --format-picked-accent: #a06ef0;
-    --action-bg: rgba(255, 255, 255, 0.2);
-    --action-bg-hover: rgba(255, 255, 255, 0.35);
+    --action-bg: rgba(0, 0, 0, 0.28);
+    --action-bg-hover: rgba(0, 0, 0, 0.4);
     --dialog-shadow: rgba(0, 0, 0, 0.5);
     --dialog-backdrop: rgba(0, 0, 0, 0.5);
     --dialog-btn-bg: #2a2a2a;
@@ -166,11 +166,7 @@ body {
   -webkit-background-clip: text;
   background-clip: text;
   will-change: background-position;
-}
-
-.title--rainbow-animate {
-  animation: rainbow-shift 1s ease forwards;
-  animation: shimmer 8s ease-in-out infinite;
+  animation: shimmer 8s ease-in-out infinite reverse;
 }
 
 .header__controls {
@@ -706,11 +702,11 @@ body {
 }
 
 .confirm-dialog__btn--danger {
-  border-color: #e6a817;
-  background: #e6a817;
+  border-color: #d65353;
+  background: #d65353;
   color: #fff;
 }
 
 .confirm-dialog__btn--danger:hover {
-  background: #d49a0e;
+  background: #c54848;
 }

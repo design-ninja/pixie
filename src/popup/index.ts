@@ -109,21 +109,6 @@ window.addEventListener("DOMContentLoaded", async () => {
   let isPickActionLocked = false;
   let activeOutputFormat = await getActiveOutputFormat();
 
-  const logoTitle = document.querySelector<HTMLElement>(".title--rainbow");
-  if (logoTitle) {
-    let isAnimating = false;
-    logoTitle.style.cursor = "pointer";
-    logoTitle.addEventListener("click", () => {
-      if (isAnimating) return;
-      isAnimating = true;
-      logoTitle.classList.add("title--rainbow-animate");
-      logoTitle.addEventListener("animationend", () => {
-        logoTitle.classList.remove("title--rainbow-animate");
-        isAnimating = false;
-      }, { once: true });
-    });
-  }
-
   const clearBadgeMessage: ClearBadgeMessage = { query: "clear_badge" };
 
   renderFormatOptions(formatSelect, activeOutputFormat);
