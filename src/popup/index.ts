@@ -11,6 +11,7 @@ import type { ClearBadgeMessage, PopupToContentMessage } from "../shared/message
 
 const REVIEW_URL = "https://chromewebstore.google.com/detail/nbfoiiglmnkmdhhaenkekmodabpcfnhc?utm_source=ext_sidebar";
 const COFFEE_URL = "https://www.buymeacoffee.com/design_ninja";
+const AUTHOR_URL = "https://lirik.com/en";
 const RESTRICTED_PAGE_MESSAGE = "Pixie can't access this page";
 
 function confirmClearHistory(): Promise<boolean> {
@@ -94,6 +95,7 @@ window.addEventListener("DOMContentLoaded", async () => {
   const clearAllLink = getRequiredElement<HTMLButtonElement>("#clearAllLink");
   const leaveReviewLink = getRequiredElement<HTMLButtonElement>("#leaveReviewLink");
   const buyCoffeeLink = getRequiredElement<HTMLButtonElement>("#buyCoffeeLink");
+  const authorLink = getRequiredElement<HTMLAnchorElement>("#authorLink");
 
   let isPickActionLocked = false;
   let activeOutputFormat = await getActiveOutputFormat();
@@ -167,6 +169,11 @@ window.addEventListener("DOMContentLoaded", async () => {
     window.open(COFFEE_URL, "_blank");
   });
 
+  authorLink.addEventListener("click", (event) => {
+    event.preventDefault();
+    window.open(AUTHOR_URL, "_blank");
+  });
+
   const [activeTab] = await chrome.tabs.query({ active: true, currentWindow: true });
 
   if (!activeTab || typeof activeTab.url !== "string") {
@@ -180,7 +187,7 @@ window.addEventListener("DOMContentLoaded", async () => {
   } else {
     const pickButton = document.createElement("button");
     pickButton.id = "picker_btn";
-    pickButton.innerText = "Pick a color";
+    pickButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 32 32" fill="currentColor" aria-hidden="true"><path d="M27.857 4.144c-1.998-1.998-5.236-1.998-7.234 0l-3.828 3.827-.458-.458a1.452 1.452 0 0 0-2.054-.001l-1.027 1.027a1.452 1.452 0 0 0 0 2.054l8.151 8.15a1.452 1.452 0 0 0 2.054.001l1.027-1.026a1.452 1.452 0 0 0 0-2.055l-.458-.458 3.829-3.829c1.996-1.997 1.996-5.235-.002-7.232z"/><path d="M6.159 20.362c-2.54 2.541.873 3.336-.635 4.844 0 0-.238.237-.793.793-.556.557-1.747 1.589-.516 2.819 1.23 1.229 2.263.04 2.818-.517s.794-.793.794-.793c1.508-1.508 2.302.873 4.842-1.668 1.047-1.047 3.81-3.809 6.694-6.693l-5.478-5.479c-2.885 2.886-5.647 5.647-6.726 6.694z"/></svg> Grab color`;
 
     pickButton.addEventListener("click", async () => {
       if (isPickActionLocked) {

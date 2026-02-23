@@ -19,6 +19,21 @@ export function hexToRgb(hex: string): RgbColor | null {
   };
 }
 
+function srgbToLinear(value: number): number {
+  const v = value / 255;
+  return v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4;
+}
+
+function relativeLuminance(r: number, g: number, b: number): number {
+  return 0.2126 * srgbToLinear(r) + 0.7152 * srgbToLinear(g) + 0.0722 * srgbToLinear(b);
+}
+
+function contrastRatio(l1: number, l2: number): number {
+  const lighter = Math.max(l1, l2);
+  const darker = Math.min(l1, l2);
+  return (lighter + 0.05) / (darker + 0.05);
+}
+
 export function isLightColor(hexColor: string): boolean {
   const rgb = hexToRgb(hexColor);
 
@@ -26,6 +41,9 @@ export function isLightColor(hexColor: string): boolean {
     return false;
   }
 
-  const brightness = (rgb.r * 299 + rgb.g * 587 + rgb.b * 114) / 1000;
-  return brightness > 128;
+  const lum = relativeLuminance(rgb.r, rgb.g, rgb.b);
+  const contrastWithBlack = contrastRatio(lum, 0);
+  const contrastWithWhite = contrastRatio(1, lum);
+
+  return contrastWithBlack > contrastWithWhite;
 }

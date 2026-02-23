@@ -6,6 +6,12 @@
       "runtimeExecutable": "npx",
       "runtimeArgs": ["serve", "-l", "3456", "."],
       "port": 3456
+    },
+    {
+      "name": "popup-preview",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["serve", "-l", "3457", "dist"],
+      "port": 3457
     }
   ]
 }

@@ -105,7 +105,7 @@ export function createHistoryEntryElement(entry: HistoryEntry, options: HistoryE
   const swatch = document.createElement("div");
   swatch.className = "history-entry__swatch";
   swatch.style.backgroundColor = entry.sourceHex;
-  swatch.style.color = isLightColor(entry.sourceHex) ? "rgba(51, 51, 51, 0.8)" : "rgba(255, 255, 255, 0.9)";
+  swatch.style.color = isLightColor(entry.sourceHex) ? "#000" : "#fff";
   swatch.innerText = entry.valueAtPick;
 
   const swatchWrap = document.createElement("div");
