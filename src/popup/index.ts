@@ -13,6 +13,7 @@ const REVIEW_URL = "https://chromewebstore.google.com/detail/nbfoiiglmnkmdhhaenk
 const COFFEE_URL = "https://www.buymeacoffee.com/design_ninja";
 const AUTHOR_URL = "https://lirik.pro/en";
 const RESTRICTED_PAGE_MESSAGE = "Pixie can't access this page";
+const CONTENT_SCRIPT_PATH = "scripts/content/index.js";
 
 function confirmClearHistory(): Promise<boolean> {
   if (typeof HTMLDialogElement === "undefined") {
@@ -87,6 +88,13 @@ function renderFormatOptions(select: HTMLSelectElement, activeFormat: ColorForma
   });
 }
 
+async function injectContentScript(tabId: number): Promise<void> {
+  await chrome.scripting.executeScript({
+    target: { tabId },
+    files: [CONTENT_SCRIPT_PATH]
+  });
+}
+
 window.addEventListener("DOMContentLoaded", async () => {
   const mainContainer = getRequiredElement<HTMLElement>("#mainCont");
   const buttonContainer = getRequiredElement<HTMLElement>("#picker_btn_cont");
@@ -100,6 +108,21 @@ window.addEventListener("DOMContentLoaded", async () => {
 
   let isPickActionLocked = false;
   let activeOutputFormat = await getActiveOutputFormat();
+
+  const logoTitle = document.querySelector<HTMLElement>(".title--rainbow");
+  if (logoTitle) {
+    let isAnimating = false;
+    logoTitle.style.cursor = "pointer";
+    logoTitle.addEventListener("click", () => {
+      if (isAnimating) return;
+      isAnimating = true;
+      logoTitle.classList.add("title--rainbow-animate");
+      logoTitle.addEventListener("animationend", () => {
+        logoTitle.classList.remove("title--rainbow-animate");
+        isAnimating = false;
+      }, { once: true });
+    });
+  }
 
   const clearBadgeMessage: ClearBadgeMessage = { query: "clear_badge" };
 
@@ -138,8 +161,12 @@ window.addEventListener("DOMContentLoaded", async () => {
     history.forEach((entry) => {
       const historyEntryElement = createHistoryEntryElement(entry, {
         onFormatClick: async (format, value) => {
-          await navigator.clipboard.writeText(value);
-          showToast(mainContainer, "success", `${COLOR_FORMAT_LABELS[format]} value copied!`);
+          try {
+            await navigator.clipboard.writeText(value);
+            showToast(mainContainer, "success", `${COLOR_FORMAT_LABELS[format]} value copied!`);
+          } catch {
+            showToast(mainContainer, "danger", "Could not copy value");
+          }
         },
         onDelete: async (entryId) => {
           await removeHistoryEntryById(entryId);
@@ -224,6 +251,7 @@ window.addEventListener("DOMContentLoaded", async () => {
       };
 
       try {
+        await injectContentScript(activeTab.id);
         await chrome.tabs.sendMessage(activeTab.id, message);
         window.close();
       } catch {

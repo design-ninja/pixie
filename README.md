@@ -49,6 +49,7 @@ Install directly from the [Chrome Web Store](https://chromewebstore.google.com/d
 ## Permissions
 
 - **activeTab** — to pick colors from the current webpage
+- **scripting** — to inject the picker script into the active tab only when you click **Pick color**
 - **storage** — to save your color palette locally
 - **clipboardWrite** — to copy color values to clipboard
 

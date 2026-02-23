@@ -91,6 +91,18 @@ body {
   transition: none;
 }
 
+#picker_btn:focus-visible,
+.history-clear:focus-visible,
+.history-entry__action:focus-visible,
+.footer-link:focus-visible,
+.footer-author:focus-visible,
+.format-row__value:focus-visible,
+.confirm-dialog__btn:focus-visible,
+.history-entry__summary:focus-visible {
+  outline: 2px solid var(--format-picked-accent);
+  outline-offset: 2px;
+}
+
 #mainCont {
   display: flex;
   flex-direction: column;
@@ -153,6 +165,11 @@ body {
   background-position: 0% 50%;
   -webkit-background-clip: text;
   background-clip: text;
+  will-change: background-position;
+}
+
+.title--rainbow-animate {
+  animation: rainbow-shift 1s ease forwards;
   animation: shimmer 8s ease-in-out infinite;
 }
 
@@ -416,6 +433,12 @@ body {
   opacity: 1;
   pointer-events: auto;
   transition: none;
+}
+
+.history-entry__summary:focus-within .history-entry__actions,
+.history-entry__actions:focus-within {
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .history-entry__body-wrap {

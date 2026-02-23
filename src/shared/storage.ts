@@ -33,31 +33,68 @@ function clampHistorySize(history: HistoryEntry[]): HistoryEntry[] {
   return history.slice(0, MAX_HISTORY_ENTRIES);
 }
 
+function getRuntimeError(apiMethod: string): Error | null {
+  const message = chrome.runtime.lastError?.message;
+  if (!message) {
+    return null;
+  }
+
+  return new Error(`${apiMethod} failed: ${message}`);
+}
+
 function storageGet<K extends StorageKey>(key: K): Promise<Pick<StorageSchema, K>> {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     chrome.storage.local.get(key, (data) => {
+      const runtimeError = getRuntimeError("chrome.storage.local.get");
+      if (runtimeError) {
+        reject(runtimeError);
+        return;
+      }
+
       resolve(data as Pick<StorageSchema, K>);
     });
   });
 }
 
 function storageGetMany<K extends StorageKey>(keys: K[]): Promise<Pick<StorageSchema, K>> {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     chrome.storage.local.get(keys, (data) => {
+      const runtimeError = getRuntimeError("chrome.storage.local.get");
+      if (runtimeError) {
+        reject(runtimeError);
+        return;
+      }
+
       resolve(data as Pick<StorageSchema, K>);
     });
   });
 }
 
 function storageSet(data: Partial<StorageSchema>): Promise<void> {
-  return new Promise((resolve) => {
-    chrome.storage.local.set(data, () => resolve());
+  return new Promise((resolve, reject) => {
+    chrome.storage.local.set(data, () => {
+      const runtimeError = getRuntimeError("chrome.storage.local.set");
+      if (runtimeError) {
+        reject(runtimeError);
+        return;
+      }
+
+      resolve();
+    });
   });
 }
 
 function storageRemove(key: StorageKey | StorageKey[]): Promise<void> {
-  return new Promise((resolve) => {
-    chrome.storage.local.remove(key, () => resolve());
+  return new Promise((resolve, reject) => {
+    chrome.storage.local.remove(key, () => {
+      const runtimeError = getRuntimeError("chrome.storage.local.remove");
+      if (runtimeError) {
+        reject(runtimeError);
+        return;
+      }
+
+      resolve();
+    });
   });
 }
 
@@ -97,28 +134,34 @@ function isHistoryEntry(value: unknown): value is HistoryEntry {
 }
 
 function normalizeLegacyEntry(entry: Record<string, unknown>, fallbackFormat: OutputFormat): HistoryEntry | null {
-  const sourceHex = typeof entry.sourceHex === "string" ? normalizeHex(entry.sourceHex) : null;
-  if (!sourceHex) {
+  try {
+    const sourceHex = typeof entry.sourceHex === "string" ? normalizeHex(entry.sourceHex) : null;
+    if (!sourceHex) {
+      return null;
+    }
+
+    const values = getHexFormats(sourceHex);
+    const formatAtPick =
+      isColorFormatId(entry.formatAtPick) && typeof entry.valueAtPick === "string"
+        ? entry.formatAtPick
+        : fallbackFormat;
+
+    const valueAtPick =
+      isColorFormatId(entry.formatAtPick) && typeof entry.valueAtPick === "string"
+        ? entry.valueAtPick
+        : values[formatAtPick];
+
+    return {
+      id: typeof entry.id === "string" ? entry.id : `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+      createdAt: typeof entry.createdAt === "string" ? entry.createdAt : new Date().toISOString(),
+      sourceHex,
+      formatAtPick,
+      valueAtPick,
+      values
+    };
+  } catch {
     return null;
   }
-
-  const values = getHexFormats(sourceHex);
-  const formatAtPick =
-    isColorFormatId(entry.formatAtPick) && typeof entry.valueAtPick === "string" ? entry.formatAtPick : fallbackFormat;
-
-  const valueAtPick =
-    isColorFormatId(entry.formatAtPick) && typeof entry.valueAtPick === "string"
-      ? entry.valueAtPick
-      : values[formatAtPick];
-
-  return {
-    id: typeof entry.id === "string" ? entry.id : `${Date.now()}-${Math.random().toString(16).slice(2)}`,
-    createdAt: typeof entry.createdAt === "string" ? entry.createdAt : new Date().toISOString(),
-    sourceHex,
-    formatAtPick,
-    valueAtPick,
-    values
-  };
 }
 
 function createHistoryEntryFromLegacyHex(hex: string): HistoryEntry | null {

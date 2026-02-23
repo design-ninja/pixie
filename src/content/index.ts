@@ -8,6 +8,12 @@ const TOAST_VISIBLE_MS = 2600;
 const TOAST_ENTER_MS = 320;
 const TOAST_EXIT_MS = 260;
 
+declare global {
+  interface Window {
+    __pixieContentScriptRegistered?: boolean;
+  }
+}
+
 function getToastHost(): HTMLElement | null {
   if (!document.documentElement) {
     return null;
@@ -138,33 +144,42 @@ async function storePickedColor(sourceHex: string): Promise<string> {
   return entry.valueAtPick;
 }
 
-chrome.runtime.onMessage.addListener((message: unknown) => {
-  if (!isPopupToContentMessage(message)) {
-    return;
-  }
+if (!window.__pixieContentScriptRegistered) {
+  window.__pixieContentScriptRegistered = true;
 
-  window.setTimeout(() => {
-    const eyeDropper = new EyeDropper();
+  chrome.runtime.onMessage.addListener((message: unknown) => {
+    if (!isPopupToContentMessage(message)) {
+      return;
+    }
 
-    eyeDropper
-      .open()
-      .then(async (result) => {
-        const color = result.sRGBHex;
-        const copiedValue = await storePickedColor(color);
+    if (typeof EyeDropper === "undefined") {
+      showInPageToast("EyeDropper is not supported on this page");
+      return;
+    }
 
-        try {
-          await navigator.clipboard.writeText(copiedValue);
-          showInPageToast(`Pixie copied: ${copiedValue}`, color);
-        } catch (error) {
-          console.error("Could not copy color:", error);
-          showInPageToast("Could not copy color");
-        }
-      })
-      .catch((error) => {
-        if (error instanceof DOMException && error.name === "AbortError") {
-          return;
-        }
-        console.log(error);
-      });
-  }, 500);
-});
+    window.setTimeout(() => {
+      const eyeDropper = new EyeDropper();
+
+      eyeDropper
+        .open()
+        .then(async (result) => {
+          const color = result.sRGBHex;
+          const copiedValue = await storePickedColor(color);
+
+          try {
+            await navigator.clipboard.writeText(copiedValue);
+            showInPageToast(`Pixie copied: ${copiedValue}`, color);
+          } catch (error) {
+            console.error("Could not copy color:", error);
+            showInPageToast("Could not copy color");
+          }
+        })
+        .catch((error) => {
+          if (error instanceof DOMException && error.name === "AbortError") {
+            return;
+          }
+          console.log(error);
+        });
+    }, 500);
+  });
+}
