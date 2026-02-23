@@ -5,10 +5,6 @@ export type PopupToContentMessage = {
   query: "eye_dropper_clicked";
 };
 
-export type BadgeColorMessage = {
-  color: string;
-};
-
 export type HistoryEntrySavedMessage = {
   query: "history_entry_saved";
   sourceColor: string;
@@ -37,14 +33,6 @@ export function isClearBadgeMessage(message: unknown): message is ClearBadgeMess
   }
 
   return message.query === "clear_badge";
-}
-
-export function isBadgeColorMessage(message: unknown): message is BadgeColorMessage {
-  if (!isObject(message)) {
-    return false;
-  }
-
-  return typeof message.color === "string";
 }
 
 export function isHistoryEntrySavedMessage(message: unknown): message is HistoryEntrySavedMessage {

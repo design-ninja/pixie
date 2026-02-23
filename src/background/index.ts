@@ -1,19 +1,14 @@
-import { isBadgeColorMessage, isClearBadgeMessage, isHistoryEntrySavedMessage } from "../shared/messages.js";
+import { isClearBadgeMessage, isHistoryEntrySavedMessage } from "../shared/messages.js";
+
+const DEFAULT_ACTION_TITLE = "Pixie - Color Picker";
 
 chrome.runtime.onMessage.addListener((message: unknown) => {
   if (isHistoryEntrySavedMessage(message)) {
-    chrome.action.setBadgeBackgroundColor({ color: message.sourceColor });
-    chrome.action.setBadgeText({ text: " " });
-    return;
-  }
-
-  if (isBadgeColorMessage(message)) {
-    chrome.action.setBadgeBackgroundColor({ color: message.color });
-    chrome.action.setBadgeText({ text: " " });
+    chrome.action.setTitle({ title: `Pixie copied: ${message.sourceColor}` });
     return;
   }
 
   if (isClearBadgeMessage(message)) {
-    chrome.action.setBadgeText({ text: "" });
+    chrome.action.setTitle({ title: DEFAULT_ACTION_TITLE });
   }
 });
