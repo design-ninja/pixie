@@ -7,7 +7,7 @@ A lightweight Chrome extension for picking, copying, and saving colors in multip
 - 🎨 **Pick colors** from any webpage using the native EyeDropper API
 - 📋 **One-click copy** — click any saved color to copy it to clipboard
 - 💾 **Persistent storage** — your color palette is saved locally
-- 🌗 **Smart contrast** — text adapts to light/dark backgrounds
+- 🎛️ **Multiple color formats** — work with HEX, RGB, HSL, OKLCH, OKLab, Lab, LCH, and Display-P3
 
 ## Installation
 
@@ -41,10 +41,18 @@ Install directly from the [Chrome Web Store](https://chromewebstore.google.com/d
 ## Usage
 
 1. Click the extension icon in your browser toolbar
-2. Press **"Pick a color"** button
-3. Click anywhere on the page to capture the color
-4. Your picked colors are saved and displayed in the popup
-5. Click any color value to copy it to clipboard
+2. Select your preferred output format in the format dropdown (default: **HEX**)
+3. Press **"Pick a color"** button
+4. Click anywhere on the page to capture the color
+5. Pixie saves the picked color with values in all supported formats and copies the selected format value
+6. Open a history item to copy any specific format value
+
+## Color Formats And Copying
+
+- Supported formats: **HEX**, **RGB**, **HSL**, **OKLCH**, **OKLab**, **Lab**, **LCH**, **Display-P3**
+- The dropdown format controls which value is copied immediately after picking a color
+- Each history entry stores all format variants, so you can expand it and copy any format on demand
+- Use the quick **copy** action on a history card to copy the originally picked value
 
 ## Permissions
 
