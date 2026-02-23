@@ -13,7 +13,7 @@
     <div id="mainCont">
         <div id="header">
             <div class="header__logo">
-                <img src="pixie-small.png" alt="Pixie">
+                <img src="pixie.png" alt="Pixie" class="header__icon">
                 <h1 class="title title--rainbow">Pixie</h1>
             </div>
             <div class="header__controls">
@@ -35,19 +35,21 @@
 
         <div id="picker_btn_cont"></div>
 
-        <div class="history-head">
-            <h2 class="history-title">History</h2>
-            <button id="clearAllLink" class="history-clear" type="button">Clear all</button>
-        </div>
+        <div id="historyScroll" class="history-scroll">
+            <div class="history-head">
+                <h2 class="history-title">History <span id="historyCount" class="history-count" hidden></span></h2>
+                <button id="clearAllLink" class="history-clear" type="button">Clear all</button>
+            </div>
 
-        <div id="result"></div>
+            <div id="result"></div>
+        </div>
 
         <div class="popup-footer">
             <div class="footer-group">
                 <button id="leaveReviewLink" class="footer-link" type="button">⭐ Leave a review</button>
                 <button id="buyCoffeeLink" class="footer-link" type="button">☕ Buy me a coffee</button>
             </div>
-            <span class="footer-brand">Made by <a href="https://lirik.com/en" id="authorLink" class="footer-author">lirik</a> 💚</span>
+            <span class="footer-brand">Made by <a href="https://lirik.pro/en" id="authorLink" class="footer-author">lirik</a> 💚</span>
         </div>
     </div>
 </body>

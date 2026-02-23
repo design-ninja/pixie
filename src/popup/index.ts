@@ -11,7 +11,7 @@ import type { ClearBadgeMessage, PopupToContentMessage } from "../shared/message
 
 const REVIEW_URL = "https://chromewebstore.google.com/detail/nbfoiiglmnkmdhhaenkekmodabpcfnhc?utm_source=ext_sidebar";
 const COFFEE_URL = "https://www.buymeacoffee.com/design_ninja";
-const AUTHOR_URL = "https://lirik.com/en";
+const AUTHOR_URL = "https://lirik.pro/en";
 const RESTRICTED_PAGE_MESSAGE = "Pixie can't access this page";
 
 function confirmClearHistory(): Promise<boolean> {
@@ -92,6 +92,7 @@ window.addEventListener("DOMContentLoaded", async () => {
   const buttonContainer = getRequiredElement<HTMLElement>("#picker_btn_cont");
   const resultList = getRequiredElement<HTMLElement>("#result");
   const formatSelect = getRequiredElement<HTMLSelectElement>("#formatSelect");
+  const historyCount = getRequiredElement<HTMLSpanElement>("#historyCount");
   const clearAllLink = getRequiredElement<HTMLButtonElement>("#clearAllLink");
   const leaveReviewLink = getRequiredElement<HTMLButtonElement>("#leaveReviewLink");
   const buyCoffeeLink = getRequiredElement<HTMLButtonElement>("#buyCoffeeLink");
@@ -114,7 +115,7 @@ window.addEventListener("DOMContentLoaded", async () => {
     await clearColorHistory();
     await chrome.runtime.sendMessage(clearBadgeMessage);
     await refreshPopup();
-    showToast(mainContainer, "#ffe7e7", "Color history cleared");
+    showToast(mainContainer, "danger", "Color history cleared");
   };
 
   const refreshPopup = async (): Promise<void> => {
@@ -122,6 +123,8 @@ window.addEventListener("DOMContentLoaded", async () => {
     resultList.innerHTML = "";
     resultList.classList.toggle("result--history", history.length > 0);
     clearAllLink.hidden = history.length === 0;
+    historyCount.hidden = history.length === 0;
+    historyCount.textContent = String(history.length);
 
     if (history.length === 0) {
       const emptyState = document.createElement("p");
@@ -136,12 +139,12 @@ window.addEventListener("DOMContentLoaded", async () => {
       const historyEntryElement = createHistoryEntryElement(entry, {
         onFormatClick: async (format, value) => {
           await navigator.clipboard.writeText(value);
-          showToast(mainContainer, "#FEF2CE", `${COLOR_FORMAT_LABELS[format]} value copied!`);
+          showToast(mainContainer, "success", `${COLOR_FORMAT_LABELS[format]} value copied!`);
         },
         onDelete: async (entryId) => {
           await removeHistoryEntryById(entryId);
           await refreshPopup();
-          showToast(mainContainer, "#ffe7e7", "History entry deleted");
+          showToast(mainContainer, "danger", "History entry deleted");
         }
       });
 
@@ -154,7 +157,7 @@ window.addEventListener("DOMContentLoaded", async () => {
   formatSelect.addEventListener("change", async () => {
     activeOutputFormat = formatSelect.value as ColorFormatId;
     await setActiveOutputFormat(activeOutputFormat);
-    showToast(mainContainer, "#dce9ff", `Pick format: ${COLOR_FORMAT_LABELS[activeOutputFormat]}`);
+    showToast(mainContainer, "info", `Pick format: ${COLOR_FORMAT_LABELS[activeOutputFormat]}`);
   });
 
   clearAllLink.addEventListener("click", () => {
@@ -176,18 +179,27 @@ window.addEventListener("DOMContentLoaded", async () => {
 
   const [activeTab] = await chrome.tabs.query({ active: true, currentWindow: true });
 
+  const renderDisabledButton = (message: string): void => {
+    const btn = document.createElement("button");
+    btn.id = "picker_btn";
+    btn.className = "picker_btn--disabled";
+    btn.disabled = true;
+    btn.textContent = message;
+    buttonContainer.appendChild(btn);
+  };
+
   if (!activeTab || typeof activeTab.url !== "string") {
-    buttonContainer.innerHTML = `<i>${RESTRICTED_PAGE_MESSAGE}</i>`;
+    renderDisabledButton(RESTRICTED_PAGE_MESSAGE);
   } else if (activeTab.url.startsWith("chrome")) {
-    buttonContainer.innerHTML = "<i>Pixie can't access Chrome pages</i>";
+    renderDisabledButton("Pixie can't access Chrome pages");
   } else if (activeTab.url.startsWith("file")) {
-    buttonContainer.innerHTML = "<i>Pixie can't access local pages</i>";
+    renderDisabledButton("Pixie can't access local pages");
   } else if (isRestrictedTabUrl(activeTab.url)) {
-    buttonContainer.innerHTML = `<i>${RESTRICTED_PAGE_MESSAGE}</i>`;
+    renderDisabledButton(RESTRICTED_PAGE_MESSAGE);
   } else {
     const pickButton = document.createElement("button");
     pickButton.id = "picker_btn";
-    pickButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 32 32" fill="currentColor" aria-hidden="true"><path d="M27.857 4.144c-1.998-1.998-5.236-1.998-7.234 0l-3.828 3.827-.458-.458a1.452 1.452 0 0 0-2.054-.001l-1.027 1.027a1.452 1.452 0 0 0 0 2.054l8.151 8.15a1.452 1.452 0 0 0 2.054.001l1.027-1.026a1.452 1.452 0 0 0 0-2.055l-.458-.458 3.829-3.829c1.996-1.997 1.996-5.235-.002-7.232z"/><path d="M6.159 20.362c-2.54 2.541.873 3.336-.635 4.844 0 0-.238.237-.793.793-.556.557-1.747 1.589-.516 2.819 1.23 1.229 2.263.04 2.818-.517s.794-.793.794-.793c1.508-1.508 2.302.873 4.842-1.668 1.047-1.047 3.81-3.809 6.694-6.693l-5.478-5.479c-2.885 2.886-5.647 5.647-6.726 6.694z"/></svg> Grab color`;
+    pickButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 32 32" fill="currentColor" aria-hidden="true"><path d="M27.857 4.144c-1.998-1.998-5.236-1.998-7.234 0l-3.828 3.827-.458-.458a1.452 1.452 0 0 0-2.054-.001l-1.027 1.027a1.452 1.452 0 0 0 0 2.054l8.151 8.15a1.452 1.452 0 0 0 2.054.001l1.027-1.026a1.452 1.452 0 0 0 0-2.055l-.458-.458 3.829-3.829c1.996-1.997 1.996-5.235-.002-7.232z"/><path d="M6.159 20.362c-2.54 2.541.873 3.336-.635 4.844 0 0-.238.237-.793.793-.556.557-1.747 1.589-.516 2.819 1.23 1.229 2.263.04 2.818-.517s.794-.793.794-.793c1.508-1.508 2.302.873 4.842-1.668 1.047-1.047 3.81-3.809 6.694-6.693l-5.478-5.479c-2.885 2.886-5.647 5.647-6.726 6.694z"/></svg> Pick color`;
 
     pickButton.addEventListener("click", async () => {
       if (isPickActionLocked) {
@@ -195,7 +207,7 @@ window.addEventListener("DOMContentLoaded", async () => {
       }
 
       if (typeof EyeDropper === "undefined") {
-        showToast(mainContainer, "#FEF2CE", "Your browser does not support the EyeDropper API");
+        showToast(mainContainer, "success", "Your browser does not support the EyeDropper API");
         return;
       }
 
@@ -217,7 +229,7 @@ window.addEventListener("DOMContentLoaded", async () => {
       } catch {
         isPickActionLocked = false;
         pickButton.disabled = false;
-        showToast(mainContainer, "#FEF2CE", "This page is not ready. Reload the tab and try again.");
+        showToast(mainContainer, "success", "This page is not ready. Reload the tab and try again.");
       }
     });
 

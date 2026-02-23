@@ -4,15 +4,15 @@
   "version": "2.0.0",
   "manifest_version": 3,
   "icons": {
-    "16": "pixie-small.png",
-    "48": "pixie-small.png",
-    "128": "pixie-small.png"
+    "16": "pixie.png",
+    "48": "pixie.png",
+    "128": "pixie.png"
   },
   "action": {
     "default_popup": "popup.html",
     "default_icon": {
-      "16": "pixie-small.png",
-      "48": "pixie-small.png"
+      "16": "pixie.png",
+      "48": "pixie.png"
     }
   },
   "background": {

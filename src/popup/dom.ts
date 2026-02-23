@@ -2,7 +2,9 @@ import { COLOR_FORMAT_IDS, COLOR_FORMAT_LABELS, type ColorFormatId } from "../sh
 import type { HistoryEntry } from "../shared/color-schemes.js";
 import { isLightColor } from "../shared/color.js";
 
-export function showToast(mainContainer: HTMLElement, color: string, message: string): void {
+export type ToastVariant = "success" | "danger" | "info";
+
+export function showToast(mainContainer: HTMLElement, variant: ToastVariant, message: string): void {
   void mainContainer;
 
   let toastLayer = document.getElementById("toastLayer");
@@ -14,20 +16,24 @@ export function showToast(mainContainer: HTMLElement, color: string, message: st
   }
 
   const toast = document.createElement("div");
-  toast.className = "errorLabel";
-  toast.style.backgroundColor = color;
+  toast.className = `errorLabel toast--${variant} toast-enter`;
   toast.innerText = message;
 
   toastLayer.appendChild(toast);
 
   window.setTimeout(() => {
-    if (toast.parentElement === toastLayer) {
-      toastLayer.removeChild(toast);
-    }
+    if (toast.parentElement !== toastLayer) return;
 
-    if (toastLayer.childElementCount === 0 && toastLayer.parentElement) {
-      toastLayer.parentElement.removeChild(toastLayer);
-    }
+    toast.classList.remove("toast-enter");
+    toast.classList.add("toast-exit");
+
+    toast.addEventListener("animationend", () => {
+      toast.remove();
+
+      if (toastLayer.childElementCount === 0 && toastLayer.parentElement) {
+        toastLayer.remove();
+      }
+    }, { once: true });
   }, 2000);
 }
 
