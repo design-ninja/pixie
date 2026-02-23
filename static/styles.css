@@ -4,7 +4,7 @@
   --surface: #ffffff;
   --surface-strong: #ffffff;
   --text: #333333;
-  --muted: #333333;
+  --muted: #999999;
   --border: rgba(51, 51, 51, 0.12);
   --border-strong: rgba(51, 51, 51, 0.18);
   --icon-muted: #8a8f98;
@@ -238,7 +238,7 @@ body {
   min-height: 0;
   flex: 1;
   overflow: auto;
-  padding-right: 4px;
+  scrollbar-gutter: stable;
   margin-top: 4px;
 }
 
@@ -315,6 +315,7 @@ body {
   padding: 12px;
   color: var(--muted);
   line-height: 1.4;
+  text-align: center;
 }
 
 .history-entry {
@@ -411,11 +412,29 @@ body {
   transition: none;
 }
 
+.history-entry__body-wrap {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.2s ease;
+}
+
+.history-entry__body-wrap--open {
+  grid-template-rows: 1fr;
+}
+
 .history-entry__body {
-  border-top: 1px solid var(--border);
-  padding: 10px;
   display: grid;
   gap: 6px;
+  overflow: hidden;
+  padding: 10px;
+  border-top: 1px solid var(--border);
+  transition: padding 0.2s ease, border-top-color 0.2s ease;
+}
+
+.history-entry__body-wrap:not(.history-entry__body-wrap--open) .history-entry__body {
+  padding-top: 0;
+  padding-bottom: 0;
+  border-top-color: transparent;
 }
 
 .format-row {

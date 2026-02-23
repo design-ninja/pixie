@@ -129,7 +129,7 @@ window.addEventListener("DOMContentLoaded", async () => {
     if (history.length === 0) {
       const emptyState = document.createElement("p");
       emptyState.className = "empty-state";
-      emptyState.innerText = "Pick a color to store values in multiple color types.";
+      emptyState.innerText = "Your palette is empty — grab a color and it\u2019ll show up here";
       resultList.appendChild(emptyState);
       resultList.style.display = "block";
       return;

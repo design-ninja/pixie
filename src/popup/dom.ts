@@ -150,6 +150,9 @@ export function createHistoryEntryElement(entry: HistoryEntry, options: HistoryE
   swatchWrap.append(swatch, actions);
   summary.append(swatchWrap);
 
+  const bodyWrap = document.createElement("div");
+  bodyWrap.className = "history-entry__body-wrap";
+
   const body = document.createElement("div");
   body.className = "history-entry__body";
   const pickedAtTimestamp = formatTimestamp(entry.createdAt);
@@ -160,7 +163,25 @@ export function createHistoryEntryElement(entry: HistoryEntry, options: HistoryE
     );
   });
 
-  accordion.append(summary, body);
+  bodyWrap.append(body);
+  accordion.append(summary, bodyWrap);
+
+  summary.addEventListener("click", (event) => {
+    event.preventDefault();
+
+    if (accordion.open) {
+      bodyWrap.classList.remove("history-entry__body-wrap--open");
+      bodyWrap.addEventListener("transitionend", () => {
+        accordion.open = false;
+      }, { once: true });
+    } else {
+      accordion.open = true;
+      requestAnimationFrame(() => {
+        bodyWrap.classList.add("history-entry__body-wrap--open");
+      });
+    }
+  });
+
   container.append(accordion);
   return container;
 }
