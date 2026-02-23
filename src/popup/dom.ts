@@ -36,6 +36,25 @@ type HistoryEntryRenderOptions = {
   onDelete: (entryId: string) => void;
 };
 
+const timestampFormatter = new Intl.DateTimeFormat("sv-SE", {
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+  hour: "2-digit",
+  minute: "2-digit",
+  hour12: false
+});
+
+function formatTimestamp(value: string): string {
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+
+  return timestampFormatter.format(date);
+}
+
 function createFormatRow(
   format: ColorFormatId,
   value: string,
@@ -116,7 +135,7 @@ export function createHistoryEntryElement(entry: HistoryEntry, options: HistoryE
   const timestamp = document.createElement("time");
   timestamp.className = "history-entry__time";
   timestamp.dateTime = entry.createdAt;
-  timestamp.innerText = new Date(entry.createdAt).toLocaleString();
+  timestamp.innerText = formatTimestamp(entry.createdAt);
 
   meta.append(formatLabel, timestamp);
   body.append(meta);

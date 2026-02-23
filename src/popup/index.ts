@@ -10,10 +10,44 @@ import {
 import { COLOR_FORMAT_IDS, COLOR_FORMAT_LABELS, type ColorFormatId } from "../shared/color-engine.js";
 import type { ClearBadgeMessage, PopupToContentMessage } from "../shared/messages.js";
 
-const REVIEW_URL =
-  "https://chrome.google.com/webstore/detail/hexpicker-%E2%80%94-a-simple-hex/nbfoiiglmnkmdhhaenkekmodabpcfnhc?utm_source=ext_sidebar&hl=en-GB";
+const REVIEW_URL = "https://chromewebstore.google.com/detail/nbfoiiglmnkmdhhaenkekmodabpcfnhc?utm_source=ext_sidebar";
 const COFFEE_URL = "https://www.buymeacoffee.com/design_ninja";
-const RESTRICTED_PAGE_MESSAGE = "ColorPicker can't access this page";
+const RESTRICTED_PAGE_MESSAGE = "Pixie can't access this page";
+
+function confirmClearHistory(): Promise<boolean> {
+  if (typeof HTMLDialogElement === "undefined") {
+    return Promise.resolve(window.confirm("Clear all saved colors? This action cannot be undone."));
+  }
+
+  const dialog = document.createElement("dialog");
+  dialog.className = "confirm-dialog";
+  dialog.innerHTML = `
+    <form method="dialog" class="confirm-dialog__form">
+      <h2 class="confirm-dialog__title">Clear history?</h2>
+      <p class="confirm-dialog__text">This will remove all saved colors. This action cannot be undone.</p>
+      <div class="confirm-dialog__actions">
+        <button type="submit" value="cancel" class="confirm-dialog__btn">Cancel</button>
+        <button type="submit" value="confirm" class="confirm-dialog__btn confirm-dialog__btn--danger">Clear all</button>
+      </div>
+    </form>
+  `;
+
+  document.body.appendChild(dialog);
+
+  return new Promise((resolve) => {
+    dialog.addEventListener(
+      "close",
+      () => {
+        const shouldClear = dialog.returnValue === "confirm";
+        dialog.remove();
+        resolve(shouldClear);
+      },
+      { once: true }
+    );
+
+    dialog.showModal();
+  });
+}
 
 function getRequiredElement<T extends HTMLElement>(selector: string): T {
   const element = document.querySelector<T>(selector);
@@ -109,9 +143,16 @@ window.addEventListener("DOMContentLoaded", async () => {
 
   setupPopupMenu(menu, header, {
     onClearHistory: async () => {
+      const shouldClear = await confirmClearHistory();
+
+      if (!shouldClear) {
+        return;
+      }
+
       await clearColorHistory();
       await chrome.runtime.sendMessage(clearBadgeMessage);
       await refreshPopup();
+      showToast(mainContainer, "#ffe7e7", "Color history cleared");
     },
     onLeaveReview: () => {
       window.open(REVIEW_URL, "_blank");
@@ -126,9 +167,9 @@ window.addEventListener("DOMContentLoaded", async () => {
   if (!activeTab || typeof activeTab.url !== "string") {
     buttonContainer.innerHTML = `<i>${RESTRICTED_PAGE_MESSAGE}</i>`;
   } else if (activeTab.url.startsWith("chrome")) {
-    buttonContainer.innerHTML = "<i>ColorPicker can't access Chrome pages</i>";
+    buttonContainer.innerHTML = "<i>Pixie can't access Chrome pages</i>";
   } else if (activeTab.url.startsWith("file")) {
-    buttonContainer.innerHTML = "<i>ColorPicker can't access local pages</i>";
+    buttonContainer.innerHTML = "<i>Pixie can't access local pages</i>";
   } else if (isRestrictedTabUrl(activeTab.url)) {
     buttonContainer.innerHTML = `<i>${RESTRICTED_PAGE_MESSAGE}</i>`;
   } else {
@@ -142,7 +183,7 @@ window.addEventListener("DOMContentLoaded", async () => {
       }
 
       if (typeof EyeDropper === "undefined") {
-        showToast(mainContainer, "#FEF2CE", "Your browser does not support the ColorPicker API");
+        showToast(mainContainer, "#FEF2CE", "Your browser does not support the EyeDropper API");
         return;
       }
 

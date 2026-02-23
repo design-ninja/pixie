@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap");
 
 :root {
   --surface: #f8f8fa;
@@ -48,6 +48,7 @@ body {
 .title {
   margin: 0;
   font-size: 16px;
+  font-weight: 500;
   color: #3d3d3d;
 }
 
@@ -75,13 +76,15 @@ body {
 .inline-format select {
   font: inherit;
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 500;
   border: 1px solid var(--border-strong);
   border-radius: 8px;
-  padding: 6px 34px 6px 10px;
-  background: #fff;
+  padding: 6px 24px 6px 10px;
   max-width: 120px;
-  background-position: right 12px center;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23555' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 8px center;
 }
 
 #picker_btn_cont {
@@ -94,7 +97,7 @@ body {
   border-radius: 8px;
   background: linear-gradient(170deg, #1d1d1d, #000000);
   color: #fff;
-  font-weight: 700;
+  font-weight: 500;
   width: 100%;
   text-align: center;
   cursor: pointer;
@@ -224,7 +227,7 @@ body {
 
 .history-entry__format {
   font-size: 11px;
-  color: #3e4f79;
+  color: var(--text);
   letter-spacing: 0.03em;
   text-transform: uppercase;
 }
@@ -253,7 +256,7 @@ body {
   color: var(--muted);
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  font-weight: 700;
+  font-weight: 500;
 }
 
 .format-row__value {
@@ -280,9 +283,9 @@ body {
   color: #3c2e04;
   padding: 8px 12px;
   text-align: left;
-  border-radius: 10px;
+  border-radius: 6px;
   border: 1px solid rgba(0, 0, 0, 0.08);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 .toast-layer {
@@ -300,7 +303,7 @@ body {
   cursor: pointer;
   padding: 4px 6px;
   font-size: 20px;
-  font-weight: 600;
+  font-weight: 500;
   line-height: 1;
   transition: opacity 0.2s;
 }
@@ -337,4 +340,67 @@ body {
 
 .show {
   display: flex;
+}
+
+.confirm-dialog {
+  border: 1px solid var(--border-strong);
+  border-radius: 10px;
+  padding: 0;
+  width: min(320px, calc(100vw - 32px));
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.28);
+}
+
+.confirm-dialog::backdrop {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.confirm-dialog__form {
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+  margin: 0;
+}
+
+.confirm-dialog__title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.confirm-dialog__text {
+  margin: 0;
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.35;
+}
+
+.confirm-dialog__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.confirm-dialog__btn {
+  font: inherit;
+  border: 1px solid var(--border);
+  background: #fff;
+  color: var(--text);
+  border-radius: 8px;
+  padding: 7px 10px;
+  cursor: pointer;
+}
+
+.confirm-dialog__btn:hover {
+  background: #f5f6f8;
+}
+
+.confirm-dialog__btn--danger {
+  border-color: #d84d4d;
+  background: #d84d4d;
+  color: #fff;
+}
+
+.confirm-dialog__btn--danger:hover {
+  background: #c84242;
 }

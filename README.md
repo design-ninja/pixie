@@ -1,6 +1,6 @@
-# #hexPicker — A Simple HEX Color Picker
+# Pixie — A Simple Color Picker
 
-A lightweight Chrome extension for picking, copying, and saving colors in HEX format with a single click.
+A lightweight Chrome extension for picking, copying, and saving colors in multiple formats with a single click.
 
 ## Features
 
@@ -14,7 +14,7 @@ A lightweight Chrome extension for picking, copying, and saving colors in HEX fo
 
 ### Chrome Web Store
 
-Install directly from the [Chrome Web Store](https://chrome.google.com/webstore/detail/hexpicker-%E2%80%94-a-simple-hex/nbfoiiglmnkmdhhaenkekmodabpcfnhc).
+Install directly from the [Chrome Web Store](https://chromewebstore.google.com/detail/nbfoiiglmnkmdhhaenkekmodabpcfnhc).
 
 ### Manual Installation
 
@@ -45,7 +45,7 @@ Install directly from the [Chrome Web Store](https://chrome.google.com/webstore/
 2. Press **"Pick a color"** button
 3. Click anywhere on the page to capture the color
 4. Your picked colors are saved and displayed in the popup
-5. Click any color swatch to copy the HEX code to clipboard
+5. Click any color value to copy it to clipboard
 
 ## Permissions
 
@@ -59,7 +59,7 @@ All data is stored locally on your device. We do not collect or transmit any per
 
 ## Support
 
-- ⭐ [Leave a review](https://chrome.google.com/webstore/detail/hexpicker-%E2%80%94-a-simple-hex/nbfoiiglmnkmdhhaenkekmodabpcfnhc)
+- ⭐ [Leave a review](https://chromewebstore.google.com/detail/nbfoiiglmnkmdhhaenkekmodabpcfnhc)
 - ☕ [Buy me a coffee](https://www.buymeacoffee.com/design_ninja)
 
 ## License

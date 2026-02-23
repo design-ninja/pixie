@@ -1,10 +1,10 @@
-# Privacy Policy for #hexPicker
+# Privacy Policy for Pixie
 
 **Last updated:** December 19, 2025
 
 ## Overview
 
-#hexPicker is a browser extension that allows users to pick, copy, and save colors in hex format. We are committed to protecting your privacy.
+Pixie is a browser extension that allows users to pick, copy, and save colors in multiple formats. We are committed to protecting your privacy.
 
 ## Data Collection
 
