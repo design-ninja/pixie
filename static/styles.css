@@ -498,7 +498,7 @@ body {
 }
 
 .toast--danger {
-  background-color: #ffe7e7;
+  background-color: #fff8e1;
 }
 
 .toast--info {
@@ -512,8 +512,8 @@ body {
   }
 
   .toast--danger {
-    background-color: #3a2020;
-    color: #e8a0a0;
+    background-color: #3a3520;
+    color: #e8d48a;
   }
 
   .toast--info {
@@ -677,11 +677,11 @@ body {
 }
 
 .confirm-dialog__btn--danger {
-  border-color: #d84d4d;
-  background: #d84d4d;
+  border-color: #e6a817;
+  background: #e6a817;
   color: #fff;
 }
 
 .confirm-dialog__btn--danger:hover {
-  background: #c84242;
+  background: #d49a0e;
 }
