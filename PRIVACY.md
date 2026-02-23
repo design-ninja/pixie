@@ -1,10 +1,10 @@
-# Privacy Policy for #hexPicker
+# Privacy Policy for Pixie
 
-**Last updated:** December 19, 2025
+**Last updated:** February 23, 2026
 
 ## Overview
 
-#hexPicker is a browser extension that allows users to pick, copy, and save colors in hex format. We are committed to protecting your privacy.
+Pixie is a browser extension that allows users to pick, copy, and save colors in multiple formats. We are committed to protecting your privacy.
 
 ## Data Collection
 
@@ -25,16 +25,17 @@ We do not:
 The extension requires the following permissions:
 
 - **activeTab**: To pick colors from the current webpage
+- **scripting**: To inject the color-picker content script only into the active tab when you click "Pick color"
 - **storage**: To save your color palette locally on your device
 - **clipboardWrite**: To copy color values to your clipboard
 
 ## Content Script
 
-The extension uses a content script that runs on all URLs to enable the color picker functionality. This script only reads pixel colors when you activate the picker and does not collect or transmit any other page data.
+The extension injects a content script only after you click "Pick color". It runs only in the active tab to open the EyeDropper, save the selected color locally, and copy the selected value to your clipboard. It does not collect or transmit page content.
 
 ## Data Security
 
-Your data is stored locally in your browser's encrypted storage. Only you have access to this data. Uninstalling the extension will remove all stored data.
+Your data is stored locally in your browser profile via `chrome.storage.local`. We do not transmit this data externally. Uninstalling the extension removes extension-local data.
 
 ## Changes to This Policy
 
