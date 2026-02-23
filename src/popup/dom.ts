@@ -59,6 +59,7 @@ function createFormatRow(
   format: ColorFormatId,
   value: string,
   highlighted: boolean,
+  pickedAtTimestamp: string,
   options: HistoryEntryRenderOptions
 ): HTMLDivElement {
   const row = document.createElement("div");
@@ -71,6 +72,10 @@ function createFormatRow(
   const label = document.createElement("span");
   label.className = "format-row__label";
   label.innerText = COLOR_FORMAT_LABELS[format];
+
+  if (highlighted) {
+    label.title = `Picked at ${pickedAtTimestamp}`;
+  }
 
   const button = document.createElement("button");
   button.type = "button";
@@ -100,15 +105,31 @@ export function createHistoryEntryElement(entry: HistoryEntry, options: HistoryE
   const swatch = document.createElement("div");
   swatch.className = "history-entry__swatch";
   swatch.style.backgroundColor = entry.sourceHex;
-  swatch.style.color = isLightColor(entry.sourceHex) ? "rgba(0, 0, 0, 0.7)" : "rgba(255, 255, 255, 0.9)";
+  swatch.style.color = isLightColor(entry.sourceHex) ? "rgba(51, 51, 51, 0.8)" : "rgba(255, 255, 255, 0.9)";
   swatch.innerText = entry.valueAtPick;
 
   const swatchWrap = document.createElement("div");
   swatchWrap.className = "history-entry__swatch-wrap";
 
+  const actions = document.createElement("div");
+  actions.className = "history-entry__actions";
+
+  const copyButton = document.createElement("button");
+  copyButton.type = "button";
+  copyButton.className = "history-entry__action history-entry__copy";
+  copyButton.innerText = "copy";
+  copyButton.ariaLabel = "Copy picked value";
+  copyButton.title = "Copy picked value";
+
+  copyButton.addEventListener("click", (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    options.onFormatClick(entry.formatAtPick, entry.valueAtPick);
+  });
+
   const deleteButton = document.createElement("button");
   deleteButton.type = "button";
-  deleteButton.className = "history-entry__delete";
+  deleteButton.className = "history-entry__action history-entry__delete";
   deleteButton.innerText = "×";
   deleteButton.ariaLabel = "Delete this history entry";
   deleteButton.title = "Delete this history entry";
@@ -119,29 +140,18 @@ export function createHistoryEntryElement(entry: HistoryEntry, options: HistoryE
     options.onDelete(entry.id);
   });
 
-  swatchWrap.append(swatch, deleteButton);
+  actions.append(copyButton, deleteButton);
+  swatchWrap.append(swatch, actions);
   summary.append(swatchWrap);
 
   const body = document.createElement("div");
   body.className = "history-entry__body";
-
-  const meta = document.createElement("div");
-  meta.className = "history-entry__meta";
-
-  const formatLabel = document.createElement("strong");
-  formatLabel.className = "history-entry__format";
-  formatLabel.innerText = `Picked as ${COLOR_FORMAT_LABELS[entry.formatAtPick]}`;
-
-  const timestamp = document.createElement("time");
-  timestamp.className = "history-entry__time";
-  timestamp.dateTime = entry.createdAt;
-  timestamp.innerText = formatTimestamp(entry.createdAt);
-
-  meta.append(formatLabel, timestamp);
-  body.append(meta);
+  const pickedAtTimestamp = formatTimestamp(entry.createdAt);
 
   COLOR_FORMAT_IDS.forEach((formatId) => {
-    body.appendChild(createFormatRow(formatId, entry.values[formatId], formatId === entry.formatAtPick, options));
+    body.appendChild(
+      createFormatRow(formatId, entry.values[formatId], formatId === entry.formatAtPick, pickedAtTimestamp, options)
+    );
   });
 
   accordion.append(summary, body);

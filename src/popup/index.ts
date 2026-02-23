@@ -1,5 +1,4 @@
 import { createHistoryEntryElement, showToast } from "./dom.js";
-import { setupPopupMenu } from "./menu.js";
 import {
   clearColorHistory,
   getActiveOutputFormat,
@@ -89,11 +88,12 @@ function renderFormatOptions(select: HTMLSelectElement, activeFormat: ColorForma
 
 window.addEventListener("DOMContentLoaded", async () => {
   const mainContainer = getRequiredElement<HTMLElement>("#mainCont");
-  const header = getRequiredElement<HTMLElement>("#header");
-  const menu = getRequiredElement<HTMLElement>("#menu");
   const buttonContainer = getRequiredElement<HTMLElement>("#picker_btn_cont");
   const resultList = getRequiredElement<HTMLElement>("#result");
   const formatSelect = getRequiredElement<HTMLSelectElement>("#formatSelect");
+  const clearAllLink = getRequiredElement<HTMLButtonElement>("#clearAllLink");
+  const leaveReviewLink = getRequiredElement<HTMLButtonElement>("#leaveReviewLink");
+  const buyCoffeeLink = getRequiredElement<HTMLButtonElement>("#buyCoffeeLink");
 
   let isPickActionLocked = false;
   let activeOutputFormat = await getActiveOutputFormat();
@@ -102,10 +102,24 @@ window.addEventListener("DOMContentLoaded", async () => {
 
   renderFormatOptions(formatSelect, activeOutputFormat);
 
+  const clearAllHistory = async (): Promise<void> => {
+    const shouldClear = await confirmClearHistory();
+
+    if (!shouldClear) {
+      return;
+    }
+
+    await clearColorHistory();
+    await chrome.runtime.sendMessage(clearBadgeMessage);
+    await refreshPopup();
+    showToast(mainContainer, "#ffe7e7", "Color history cleared");
+  };
+
   const refreshPopup = async (): Promise<void> => {
     const history = await getColorHistory();
     resultList.innerHTML = "";
     resultList.classList.toggle("result--history", history.length > 0);
+    clearAllLink.hidden = history.length === 0;
 
     if (history.length === 0) {
       const emptyState = document.createElement("p");
@@ -141,25 +155,16 @@ window.addEventListener("DOMContentLoaded", async () => {
     showToast(mainContainer, "#dce9ff", `Pick format: ${COLOR_FORMAT_LABELS[activeOutputFormat]}`);
   });
 
-  setupPopupMenu(menu, header, {
-    onClearHistory: async () => {
-      const shouldClear = await confirmClearHistory();
+  clearAllLink.addEventListener("click", () => {
+    void clearAllHistory();
+  });
 
-      if (!shouldClear) {
-        return;
-      }
+  leaveReviewLink.addEventListener("click", () => {
+    window.open(REVIEW_URL, "_blank");
+  });
 
-      await clearColorHistory();
-      await chrome.runtime.sendMessage(clearBadgeMessage);
-      await refreshPopup();
-      showToast(mainContainer, "#ffe7e7", "Color history cleared");
-    },
-    onLeaveReview: () => {
-      window.open(REVIEW_URL, "_blank");
-    },
-    onBuyCoffee: () => {
-      window.open(COFFEE_URL, "_blank");
-    }
+  buyCoffeeLink.addEventListener("click", () => {
+    window.open(COFFEE_URL, "_blank");
   });
 
   const [activeTab] = await chrome.tabs.query({ active: true, currentWindow: true });

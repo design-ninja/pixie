@@ -1,18 +1,18 @@
 {
-  "name": "Pixie",
+  "name": "Pixie - Color Picker",
   "description": "Effortlessly pick, copy, and save colors in multiple formats with a single click.",
   "version": "2.0.0",
   "manifest_version": 3,
   "icons": {
-    "16": "icon16.png",
-    "48": "icon48.png",
-    "128": "icon128.png"
+    "16": "pixie-small.png",
+    "48": "pixie-small.png",
+    "128": "pixie-small.png"
   },
   "action": {
     "default_popup": "popup.html",
     "default_icon": {
-      "16": "icon16.png",
-      "48": "icon48.png"
+      "16": "pixie-small.png",
+      "48": "pixie-small.png"
     }
   },
   "background": {

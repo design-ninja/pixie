@@ -13,21 +13,40 @@
     <div id="mainCont">
         <div id="header">
             <div class="header__logo">
-                <img src="logo.svg" alt="Pixie">
-                <h1 class="title">Pixie</h1>
+                <img src="pixie-small.png" alt="Pixie">
+                <h1 class="title title--rainbow">Pixie</h1>
             </div>
             <div class="header__controls">
                 <label class="inline-format" for="formatSelect">
                     <span class="sr-only">Color type</span>
                     <select id="formatSelect"></select>
                 </label>
-                <div id="menu">⋮</div>
+                <div id="menu" role="button" aria-label="More options" title="More options">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="lucide lucide-ellipsis-vertical-icon lucide-ellipsis-vertical" aria-hidden="true">
+                        <circle cx="12" cy="12" r="1" />
+                        <circle cx="12" cy="5" r="1" />
+                        <circle cx="12" cy="19" r="1" />
+                    </svg>
+                </div>
             </div>
         </div>
 
         <div id="picker_btn_cont"></div>
 
+        <div class="history-head">
+            <h2 class="history-title">Pick history</h2>
+            <button id="clearAllLink" class="history-clear" type="button">Clear all</button>
+        </div>
+
         <div id="result"></div>
+
+        <div class="popup-footer">
+            <span class="footer-brand">Pixie 2.0.0</span>
+            <button id="leaveReviewLink" class="footer-link" type="button">⭐ Leave a review</button>
+            <button id="buyCoffeeLink" class="footer-link" type="button">☕ Buy me a coffee</button>
+        </div>
     </div>
 </body>
 <script type="module" src="scripts/popup/index.js"></script>
