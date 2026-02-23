@@ -9,6 +9,7 @@ import { type HistoryEntry, isColorFormatId } from "./color-schemes.js";
 export type OutputFormat = ColorFormatId;
 
 export const DEFAULT_OUTPUT_FORMAT: OutputFormat = "hex";
+export const MAX_HISTORY_ENTRIES = 1000;
 
 export type StorageSchema = {
   color_history?: HistoryEntry[];
@@ -23,6 +24,14 @@ const STORAGE_KEYS = {
 } as const;
 
 type StorageKey = keyof StorageSchema;
+
+function clampHistorySize(history: HistoryEntry[]): HistoryEntry[] {
+  if (history.length <= MAX_HISTORY_ENTRIES) {
+    return history;
+  }
+
+  return history.slice(0, MAX_HISTORY_ENTRIES);
+}
 
 function storageGet<K extends StorageKey>(key: K): Promise<Pick<StorageSchema, K>> {
   return new Promise((resolve) => {
@@ -170,10 +179,11 @@ async function migrateLegacyColors(): Promise<HistoryEntry[]> {
     })
     .filter((item): item is HistoryEntry => item !== null);
 
-  await storageSet({ color_history: migrated });
+  const next = clampHistorySize(migrated);
+  await setColorHistory(next);
   await storageRemove(STORAGE_KEYS.LEGACY_COLORS);
 
-  return migrated;
+  return next;
 }
 
 export async function getColorHistory(): Promise<HistoryEntry[]> {
@@ -189,12 +199,12 @@ export async function getColorHistory(): Promise<HistoryEntry[]> {
 }
 
 export async function setColorHistory(history: HistoryEntry[]): Promise<void> {
-  await storageSet({ color_history: history });
+  await storageSet({ color_history: clampHistorySize(history) });
 }
 
 export async function addHistoryEntry(entry: HistoryEntry): Promise<HistoryEntry[]> {
   const history = await getColorHistory();
-  const next = [entry, ...history];
+  const next = clampHistorySize([entry, ...history]);
 
   await setColorHistory(next);
 

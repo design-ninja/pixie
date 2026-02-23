@@ -1,4 +1,10 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap");
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("./fonts/inter/Inter-Variable.woff2") format("woff2");
+}
 
 :root {
   --surface: #ffffff;
@@ -57,7 +63,7 @@
 }
 
 body {
-  font-family: "Inter", sans-serif;
+  font-family: "Inter";
   padding: 8px;
   margin: 0;
   background: var(--surface);
@@ -354,7 +360,7 @@ body {
   padding: 0 76px 0 10px;
   display: flex;
   align-items: center;
-  font-family: "Inter", sans-serif;
+  font-family: "Inter";
   font-size: 12px;
   font-weight: 400;
   box-shadow: none;
@@ -466,7 +472,7 @@ body {
   text-align: left;
   font-size: 12px;
   font-weight: 400;
-  font-family: "Inter", sans-serif;
+  font-family: "Inter";
   cursor: pointer;
   white-space: nowrap;
   overflow: hidden;
