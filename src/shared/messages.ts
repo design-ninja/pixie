@@ -19,8 +19,6 @@ export type ClearBadgeMessage = {
   query: "clear_badge";
 };
 
-export type RuntimeMessage = PopupToContentMessage | BadgeColorMessage | HistoryEntrySavedMessage | ClearBadgeMessage;
-
 function isObject(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
 }

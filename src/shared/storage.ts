@@ -4,25 +4,22 @@ import {
   getHexFormats,
   normalizeHex
 } from "./color-engine.js";
-import { createHistoryEntry, type HistoryEntry, isColorFormatId } from "./color-schemes.js";
+import { type HistoryEntry, isColorFormatId } from "./color-schemes.js";
 
 export type OutputFormat = ColorFormatId;
 
 export const DEFAULT_OUTPUT_FORMAT: OutputFormat = "hex";
-export const HISTORY_LIMIT = 50;
 
 export type StorageSchema = {
   color_history?: HistoryEntry[];
   active_output_format?: OutputFormat;
-  isExpanded?: boolean;
   color_hex_code?: string[];
 };
 
 const STORAGE_KEYS = {
   HISTORY: "color_history",
   ACTIVE_OUTPUT_FORMAT: "active_output_format",
-  LEGACY_COLORS: "color_hex_code",
-  EXPANDED: "isExpanded"
+  LEGACY_COLORS: "color_hex_code"
 } as const;
 
 type StorageKey = keyof StorageSchema;
@@ -115,6 +112,24 @@ function normalizeLegacyEntry(entry: Record<string, unknown>, fallbackFormat: Ou
   };
 }
 
+function createHistoryEntryFromLegacyHex(hex: string): HistoryEntry | null {
+  const normalizedHex = normalizeHex(hex);
+  const values = getHexFormats(normalizedHex);
+  const preservedHex = /^#[0-9a-fA-F]{6}$/.test(hex) ? hex : values.hex;
+
+  return {
+    id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+    createdAt: new Date().toISOString(),
+    sourceHex: preservedHex,
+    formatAtPick: "hex",
+    valueAtPick: preservedHex,
+    values: {
+      ...values,
+      hex: preservedHex
+    }
+  };
+}
+
 function sanitizeHistoryEntries(value: unknown, fallbackFormat: OutputFormat): HistoryEntry[] {
   if (!Array.isArray(value)) {
     return [];
@@ -132,13 +147,12 @@ function sanitizeHistoryEntries(value: unknown, fallbackFormat: OutputFormat): H
 
       return null;
     })
-    .filter((item): item is HistoryEntry => item !== null)
-    .slice(0, HISTORY_LIMIT);
+    .filter((item): item is HistoryEntry => item !== null);
 
   return normalized;
 }
 
-async function migrateLegacyColors(fallbackFormat: OutputFormat): Promise<HistoryEntry[]> {
+async function migrateLegacyColors(): Promise<HistoryEntry[]> {
   const data = await storageGet(STORAGE_KEYS.LEGACY_COLORS);
   const legacyColors = data.color_hex_code;
 
@@ -146,7 +160,15 @@ async function migrateLegacyColors(fallbackFormat: OutputFormat): Promise<Histor
     return [];
   }
 
-  const migrated = legacyColors.slice(0, HISTORY_LIMIT).map((hex) => createHistoryEntry(hex, fallbackFormat));
+  const migrated = legacyColors
+    .map((hex) => {
+      try {
+        return createHistoryEntryFromLegacyHex(hex);
+      } catch {
+        return null;
+      }
+    })
+    .filter((item): item is HistoryEntry => item !== null);
 
   await storageSet({ color_history: migrated });
   await storageRemove(STORAGE_KEYS.LEGACY_COLORS);
@@ -163,16 +185,16 @@ export async function getColorHistory(): Promise<HistoryEntry[]> {
     return history;
   }
 
-  return migrateLegacyColors(fallbackFormat);
+  return migrateLegacyColors();
 }
 
 export async function setColorHistory(history: HistoryEntry[]): Promise<void> {
-  await storageSet({ color_history: history.slice(0, HISTORY_LIMIT) });
+  await storageSet({ color_history: history });
 }
 
 export async function addHistoryEntry(entry: HistoryEntry): Promise<HistoryEntry[]> {
   const history = await getColorHistory();
-  const next = [entry, ...history].slice(0, HISTORY_LIMIT);
+  const next = [entry, ...history];
 
   await setColorHistory(next);
 
@@ -205,13 +227,4 @@ export async function getActiveOutputFormat(): Promise<OutputFormat> {
 
 export async function setActiveOutputFormat(format: OutputFormat): Promise<void> {
   await storageSet({ active_output_format: format });
-}
-
-export async function getExpandedState(): Promise<boolean> {
-  const data = await storageGet(STORAGE_KEYS.EXPANDED);
-  return data.isExpanded ?? false;
-}
-
-export async function setExpandedState(isExpanded: boolean): Promise<void> {
-  await storageSet({ isExpanded });
 }

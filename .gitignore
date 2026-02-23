@@ -28,3 +28,4 @@ Temporary Items
 # Build and dependencies
 node_modules
 dist
+dist.zip

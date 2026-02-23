@@ -8,7 +8,6 @@ A lightweight Chrome extension for picking, copying, and saving colors in multip
 - 📋 **One-click copy** — click any saved color to copy it to clipboard
 - 💾 **Persistent storage** — your color palette is saved locally
 - 🌗 **Smart contrast** — text adapts to light/dark backgrounds
-- 📂 **Expandable palette** — show more/less toggle for large collections
 
 ## Installation
 

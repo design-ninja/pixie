@@ -1,17 +1,5 @@
 import Color from "colorjs.io";
 
-export type OklchColor = {
-  l: number;
-  c: number;
-  h: number | null;
-};
-
-export type MappedHexColor = {
-  hex: string;
-  oklch: OklchColor;
-  clipped: boolean;
-};
-
 export type ColorFormatId = "hex" | "rgb" | "hsl" | "oklch" | "oklab" | "lab" | "lch" | "p3";
 
 export const COLOR_FORMAT_IDS: ColorFormatId[] = ["hex", "rgb", "hsl", "oklch", "oklab", "lab", "lch", "p3"];
@@ -27,10 +15,6 @@ export const COLOR_FORMAT_LABELS: Record<ColorFormatId, string> = {
   p3: "Display-P3"
 };
 
-const MIN_LIGHTNESS = 0;
-const MAX_LIGHTNESS = 1;
-const DEFAULT_HUE = 0;
-
 function clamp(value: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, value));
 }
@@ -42,81 +26,6 @@ export function normalizeHue(value: number): number {
 export function normalizeHex(hex: string): string {
   const normalized = hex.trim().toLowerCase();
   return normalized.startsWith("#") ? normalized : `#${normalized}`;
-}
-
-function sanitizeHue(value: number | null | undefined): number {
-  if (typeof value !== "number" || Number.isNaN(value)) {
-    return DEFAULT_HUE;
-  }
-
-  return normalizeHue(value);
-}
-
-function sanitizeLightness(value: number | null | undefined): number {
-  if (typeof value !== "number" || Number.isNaN(value)) {
-    return MIN_LIGHTNESS;
-  }
-
-  return clamp(value, MIN_LIGHTNESS, MAX_LIGHTNESS);
-}
-
-function sanitizeChroma(value: number | null | undefined): number {
-  if (typeof value !== "number" || Number.isNaN(value) || value < 0) {
-    return 0;
-  }
-
-  return value;
-}
-
-export function parseHexToOklch(hex: string): OklchColor | null {
-  try {
-    const color = new Color(hex).to("oklch");
-    const [l, c, h] = color.coords;
-
-    return {
-      l: sanitizeLightness(l),
-      c: sanitizeChroma(c),
-      h: typeof h === "number" && !Number.isNaN(h) ? normalizeHue(h) : null
-    };
-  } catch {
-    return null;
-  }
-}
-
-function createOklchColor(color: OklchColor): Color {
-  return new Color("oklch", [sanitizeLightness(color.l), sanitizeChroma(color.c), sanitizeHue(color.h)]);
-}
-
-function toSerializableOklch(color: Color): OklchColor {
-  const converted = color.to("oklch");
-  const [l, c, h] = converted.coords;
-
-  return {
-    l: sanitizeLightness(l),
-    c: sanitizeChroma(c),
-    h: typeof h === "number" && !Number.isNaN(h) ? normalizeHue(h) : null
-  };
-}
-
-export function mapOklchToHex(color: OklchColor): MappedHexColor {
-  const sourceColor = createOklchColor(color);
-  const clipped = !sourceColor.inGamut("srgb");
-  const mappedColor = clipped ? sourceColor.clone().toGamut({ space: "srgb", method: "css" }) : sourceColor;
-  const hex = mappedColor.to("srgb").toString({ format: "hex" });
-
-  return {
-    hex: normalizeHex(hex),
-    oklch: toSerializableOklch(mappedColor),
-    clipped
-  };
-}
-
-export function formatOklchForDisplay(color: OklchColor): string {
-  const lightness = (sanitizeLightness(color.l) * 100).toFixed(1);
-  const chroma = sanitizeChroma(color.c).toFixed(4);
-  const hue = color.h === null ? "none" : normalizeHue(color.h).toFixed(1);
-
-  return `oklch(${lightness}% ${chroma} ${hue})`;
 }
 
 function formatAsRgbString(color: Color): string {

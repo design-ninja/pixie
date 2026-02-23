@@ -1,10 +1,10 @@
-export type RgbColor = {
+type RgbColor = {
   r: number;
   g: number;
   b: number;
 };
 
-export function hexToRgb(hex: string): RgbColor | null {
+function hexToRgb(hex: string): RgbColor | null {
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
 
   if (!result) {
