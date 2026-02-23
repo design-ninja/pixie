@@ -1,6 +1,7 @@
 import { createHistoryEntryElement, showToast } from "./dom.js";
 import {
   clearColorHistory,
+  DEFAULT_OUTPUT_FORMAT,
   getActiveOutputFormat,
   getColorHistory,
   removeHistoryEntryById,
@@ -88,6 +89,14 @@ function renderFormatOptions(select: HTMLSelectElement, activeFormat: ColorForma
   });
 }
 
+function toColorFormat(value: string): ColorFormatId {
+  if ((COLOR_FORMAT_IDS as string[]).includes(value)) {
+    return value as ColorFormatId;
+  }
+
+  return DEFAULT_OUTPUT_FORMAT;
+}
+
 async function injectContentScript(tabId: number): Promise<void> {
   await chrome.scripting.executeScript({
     target: { tabId },
@@ -107,7 +116,7 @@ window.addEventListener("DOMContentLoaded", async () => {
   const authorLink = getRequiredElement<HTMLAnchorElement>("#authorLink");
 
   let isPickActionLocked = false;
-  let activeOutputFormat = await getActiveOutputFormat();
+  let activeOutputFormat = toColorFormat(await getActiveOutputFormat());
 
   const clearBadgeMessage: ClearBadgeMessage = { query: "clear_badge" };
 
@@ -167,7 +176,8 @@ window.addEventListener("DOMContentLoaded", async () => {
   };
 
   formatSelect.addEventListener("change", async () => {
-    activeOutputFormat = formatSelect.value as ColorFormatId;
+    activeOutputFormat = toColorFormat(formatSelect.value);
+    formatSelect.value = activeOutputFormat;
     await setActiveOutputFormat(activeOutputFormat);
     showToast(mainContainer, "info", `Pick format: ${COLOR_FORMAT_LABELS[activeOutputFormat]}`);
   });
